@@ -102,6 +102,10 @@ h1 {
     font-size: 1.25rem;
 }
 
+#high-score-display {
+    color: var(--accent-color);
+}
+
 /* New Layout */
 .game-layout {
     display: grid;

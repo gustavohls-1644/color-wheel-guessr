@@ -12,13 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
         timer: null,
         timeLeft: 60,
         tutorialOrigin: null,
-        isPaused: false
+        isPaused: false,
+        highScore: 0
     };
 
     // DOM Elements
     const elements = {
         roundDisplay: document.getElementById('round-display'),
         scoreDisplay: document.getElementById('score-display'),
+        highScoreDisplay: document.getElementById('high-score-display'),
         timerDisplay: document.getElementById('timer-display'),
         targetColor: document.getElementById('target-color'),
         canvas: document.getElementById('color-wheel'),
@@ -58,6 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initGame();
 
     function initGame() {
+        // Load high score
+        const savedHighScore = localStorage.getItem('colorWheelHighScore');
+        if (savedHighScore) {
+            state.highScore = parseInt(savedHighScore, 10);
+        }
+        updateUI();
+
         drawColorWheel();
         setupEventListeners();
         // Don't start game automatically
@@ -331,6 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function endGame() {
         state.isGameActive = false;
+
+        // Check High Score
+        if (state.score > state.highScore) {
+            state.highScore = state.score;
+            localStorage.setItem('colorWheelHighScore', state.highScore);
+            // Could add a "New High Score" message here
+        }
+        updateUI();
+
         elements.finalScore.textContent = state.score;
         elements.gameOverOverlay.classList.remove('hidden');
     }
@@ -401,12 +419,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Max distance is roughly 441 (sqrt(255^2 * 3))
         // We want 5000 points for distance 0
         // Exponential drop off
-        const score = 5000 * Math.exp(-distance / 50);
+        // Made harder: changed divisor from 50 to 30
+        const score = 5000 * Math.exp(-distance / 30);
         return Math.round(score);
     }
 
     function updateUI() {
         elements.roundDisplay.textContent = `${state.round}/${state.maxRounds}`;
         elements.scoreDisplay.textContent = state.score;
+        elements.highScoreDisplay.textContent = state.highScore;
     }
 });
